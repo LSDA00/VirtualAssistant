@@ -1,0 +1,19 @@
+# TODO:
+# * Check IBM assistant_v1.py for good source
+# * briefing should have spoken date along with day of the week
+#   Calendar events in briefing?
+
+# * "how long have you been alive" - - make it recite it's age i.e how many days since creation (OS get info?)
+# * you did x on this last y (week/year), would you like to do x today? (memory) No clue
+# * mac control i.e music (?)
+# * smart home/plug integration (?)
+# * make it so that on something like wikipedia function (AND WOLFRAM), the search term can be inside the query
+#       "search for x on wikipedia", instead of "search"-"search for what"- "for x" 
+# * is there a better news api? You should look up docs to find out how to get just headlines for briefing
+#
+# * Implement a better speech recognition engine (IBM Watson looks great)
+# Better text to speech engine IBM Watson https://stackoverflow.com/questions/50548088/make-python-speech-recognition-faster
+# 
+# * More diverse training data for model to enable better "conversation"
+
+
