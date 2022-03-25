@@ -9,45 +9,67 @@ import wolframalpha
 from newsapi import NewsApiClient
 from bs4 import BeautifulSoup
 
-# TODO:
-# * Give it a good name
-# * set up dict for trigger words / intents and corresponding functions
-# * briefing should have spoken date along with day of the week
-#   fix news in briefing so that you can respond correctly
-#   Calendar events in briefing?
-#
-# * "how long have you been alive" - - make it recite it's age i.e how many days since creation (OS get info?)
-# * you did x on this last y (week/year), would you like to do x today? (memory)
-# * mac control i.e music (?)
-# * diagnostic_mode mode: checking working functions + different voice
-# * smart home/plug integration
-# * make it so that on something like wikipedia function (AND WOLFRAM), the search term can be inside the query
-#       "search for x on wikipedia", instead of "search"-"search for what"- "for x"
-# * is there a better news api? You should look up docs to find out how to get just headlines for briefing
-# * set up random responses
+import json
+import pickle
+import numpy as np
+import random
 
-intents = {
-    "greeting": ("hi", "hello", "what's up", "hey"),
-    "quote": ("quote", "read me a quote", "tell me a kanye quote", "give me a kanye west quote",
-              "tell me a quote from kanye west"),
-    "briefing": ("briefing", "give me my briefing", "brief me", "i'd like to be briefed", "give me a briefing"),
-    "news": ("news", "what's going on in the news", "what is the news like today", "is there any news", "i would like to hear the news", "tell me the news"),
-    "time": ("time", "what time is it", "tell me the time", "what is the time"),
-    "date": ("date", "what day is it", "what is the date", "what day of the week is it", "what day is today"),
-    "weather": ("weather", "what is the weather like", "what is todays weather", "is it warm out", "is it cold out", "is it snowing", "is it raining", "how is the weather today"),
-    "wikipedia": ("i want to look something up on wikipedia", "i want to search a topic on wikipedia"),
-    "done": ("goodbye", "bye", "okay thank you", "thank you", "okay thats enough"),
-    "name": ("name", "what is your name", "what should I call you", "do you have a name", "whats your name"),
-    "wolfram": ("question", "i would like to ask you a question", "i have a question")
-}
+import nltk
+from nltk.stem import WordNetLemmatizer
+from tensorflow.keras.models import load_model
 
-# this method is for taking the commands
-# and recognizing the command from the
-# speech_Recognition module we will use
-# the recongizer method for recognizing
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+lemmatizer = WordNetLemmatizer()
+intents = json.loads(open('intents.json').read())
+words = pickle.load(open('words.pkl', 'rb'))
+classes = pickle.load(open('classes.pkl', 'rb'))
+model = load_model('chatbotmodel.h5')
+
+
+
 USER = "Lucas"
-ASSISTANT = ", 8 OH 5"
+ASSISTANT= ", 8 oh 5"
 
+
+
+def clean_up_sentence(sentence):
+    sentence_words = nltk.word_tokenize(sentence)
+    sentence_words = [lemmatizer.lemmatize(word) for word in sentence_words]
+    return sentence_words
+
+
+def bag_of_words(sentence):
+    sentence_words = clean_up_sentence(sentence)
+    bag = [0] * len(words)
+    for w in sentence_words:
+        for i, word in enumerate(words):
+            if word == w:
+                bag[i] = 1
+    return np.array(bag)
+
+
+def predict_class(sentence):
+    bow = bag_of_words(sentence)
+    res = model.predict(np.array([bow]))[0]
+    ERROR_THRESHOLD = 0.25
+    results = [[i, r] for i, r in enumerate(res) if r > ERROR_THRESHOLD]
+    results.sort(key=lambda x: x[1], reverse=True)
+    return_list = []
+    for r in results:
+        return_list.append({'intent': classes[r[0]], 'probability': str(r[1])})
+    return return_list
+
+
+def get_response(intents_list, intents_json):
+    tag = intents_list[0]['intent']
+    list_of_intents = intents_json['intents']
+    for i in list_of_intents:
+        if i['tag'] == tag:
+            result = random.choice(i['responses'])
+            break
+    return result
 
 def take_command():
 
@@ -57,7 +79,7 @@ def take_command():
         print("Listening...")
         r.pause_threshold = 1
         try:
-            r.adjust_for_ambient_noise(source, duration=0.2)
+            r.adjust_for_ambient_noise(source)
             audio_in = r.listen(source)
             query = r.recognize_google(audio_in)
             print(query)
@@ -74,7 +96,7 @@ def speak(audio):
     voices = engine.getProperty('voices')
 
     # setter method .[0]=male voice and
-    # [1]=female voice in set Property. 7, 11 stephen hawking, 17, 28, 33
+    # [1]=female voice in set Property. 7, 11, 17, 28, 33 are good
     engine.setProperty('voice', voices[33].id)
 
     # Method for the speaking of the the ASSISTANT
@@ -102,7 +124,6 @@ def tell_day():
         day_of_the_week = Day_dict[day]
         print(day_of_the_week)
         speak("Today is " + day_of_the_week)
-        print(date)
 
 # Gives a random Kanye west tweet
 
@@ -154,30 +175,36 @@ def tell_time():
 
 
 def hello():
-    hour = datetime.datetime.now().hour
-    if(hour >= 0) and (hour < 12):
-        speak(f"Good Morning {USER}, how can I help you?")
-    elif(hour >= 12) and (hour < 18):
-        speak(f"Good afternoon {USER}, how can I help you?")
-    elif(hour >= 18) and (hour <= 24):
-        speak(f"Good Evening {USER}, how can I help you?")
+    random_greeting = random.randint(1,3)
+    if(random_greeting == 1):
+        hour = datetime.datetime.now().hour
+        if(hour >= 0) and (hour < 12):
+            speak(f"Good Morning {USER}, how can I help you?")
+        elif(hour >= 12) and (hour < 18):
+            speak(f"Good afternoon {USER}, how can I help you?")
+        elif(hour >= 18) and (hour <= 24):
+            speak(f"Good Evening {USER}, how can I help you?")
+    if(random_greeting == 2):
+    
+        speak(f"Hey there {USER}, what can I do for you?")
+    
+    if(random_greeting == 3):
+    
+        speak(f"Hi {USER}, what's up?")
+    
 
 
-def wikipedia():
-    speak("Okay, what would you like to look up on wikipedia")
+def wiki():
+    speak("What would you like information about?")
     my_query = take_command().lower()
     speak(f" I am searching for {my_query}")
     my_query = my_query.replace("wikipedia", "")
 
     # it will give the summary of 4 lines from
     # wikipedia we can increase and decrease number of sentences
-    result = wikipedia.summary(query, sentences=4)
+    result = wikipedia.summary(my_query, sentences=4)
     print(f"According to wikipedia {result}")
     speak(f"According to wikipedia {result}")
-
-
-def name():
-    speak(f"I am {ASSISTANT}. your virtual assistant")
 
 
 def briefing():
@@ -190,39 +217,6 @@ def briefing():
         news()
     else:
         speak("Okay, have a great day!")
-
-
-def diagnostic_mode():
-    speak("I am ready to test greeting functionality")
-    test_1 = take_command().lower()
-    for i in intents["greeting"]:
-        if test_1 == i:
-            speak(f"greeting functionality test successful for {test_1}")
-            break
-        else:
-            speak(f"greeting functionality test failed for {test_1}")
-            print(test_1)
-            print(intents["greeting"])
-
-    speak("I am ready to test quote functionality")
-    test_2 = take_command().lower()
-    for j in intents["quote"]:
-        if test_2 == j:
-            speak(f"quote functionality test successful for {test_2}")
-            break
-        else:
-            speak(f"quote functionality test failed for {test_2}")
-            print(test_2)
-            print(intents["quote"])
-    test_3 = take_command.lower()
-    for k in intents["wolfram"]: 
-        if test_3 == k: 
-            speak(f"wolfram functionality test successful for {test_3}")
-            break
-        else:
-            speak(f"wolfram functionality test failed for {test_3}")
-            print(test_3)
-            print(intents["wolfram"])
 
 
 def wolfram():
@@ -239,10 +233,8 @@ def wolfram():
 def take_query():
 
     # calling the Hello function for
-    # maing it more interactive
-
-    diagnostic_mode()
-    # hello()
+    # making it more interactive
+    hello()
     # This loop is infinite as it will take
     # our queries continuously until and unless
     # we do not say bye to exit or terminate
@@ -255,124 +247,64 @@ def take_query():
         # output
 
         query = take_command().lower()
+        ints = predict_class(query)
+        #print(ints)
+        tag = ints[0]['intent']
+        #print(tag)
+        res = get_response(ints, intents)
 
-        if "open google" in query:
-            speak("Opening Google ")
+        if tag == 'google':
+            speak(res)
             webbrowser.open("https://www.google.com/?client=safari")
             continue
 
-        elif "what day is it" in query:
+        elif tag == 'date':
             tell_day()
             continue
 
-        elif "what time is it" in query:
+        elif tag == 'time':
             tell_time()
             continue
 
-        elif "from wikipedia" in query:
+        elif tag == 'wikipedia':
+            speak(res)
+            wiki()
 
-            speak(f" I am checking for{query}")
-            query = query.replace("wikipedia", "")
+        elif tag == 'name': 
+            speak(res)
+           
 
-            # it will give the summary of 4 lines from
-            # wikipedia we can increase and decrease number of sentences
-            result = wikipedia.summary(query, sentences=4)
-            print(f"According to wikipedia {result}")
-            speak(f"According to wikipedia {result}")
-
-        elif " your name" in query:
-            speak(f"I am {ASSISTANT}. Your deskstop Assistant")
-
-        elif "news" in query:
+        elif tag == 'news':
+            speak(res)
             news()
-        elif "weather" in query:
+        elif tag == 'weather':
+            speak(res)
             weather()
-        elif "joke" in query:
+        elif tag == 'joke':
+            speak(res)
             speak(pyjokes.get_joke())
-        elif "quote" in query:
+        elif tag == 'quote':
+            speak(res)
             quote()
-        elif "functions" in query:
-            speak("I can do lots of things, I can tell you the news, what the weather is like, search a topic on wikipedia, or even just what day it is. Would you like to ask me one of those?")
-            response = take_command()
-            if response == "yes":
-                speak("What would you like to hear about?")
-                # This problem where I cannot give more than one query is why intents were important in that video
-                # I think that you should set up some kind of struct with trigger phrases and their corresponding functions
-
-            else:
-                speak("Okay, well then here is an insightful and wise quote for you")
-                quote()
-
-        elif " daily briefing" in query:
-
-            speak("Here is your daily briefing")
-            tell_day()
-            tell_time()
-            weather()
-
-        elif "diagnostic mode" in query:
-            diagnostic_mode()
-
+        elif tag == 'briefing':
+            speak(res)
+            briefing()
         # this will exit and terminate the program
-        elif "bye" in query:
-            speak(f"Goodbye {USER}!")
+        elif tag == 'goodbye':
+            speak(res)
+            exit()
+        elif tag == 'wolfram':
+            wolfram()
+        else: 
+            speak("I'm sorry, something went wrong. Please try again")
             exit()
 
 
-def take_query_intents():
-    done = False
-    while not done:
-        query = take_command().lower()
-        for iterate_1 in intents["greeting"]:
-            if query == iterate_1:
-                hello()
-                break
-        for iterate_2 in intents["quote"]:
-            if query == iterate_2:
-                quote()
-                break
-        for iterate_3 in intents["briefing"]:
-            if query == iterate_3:
-                briefing()
-                done = True
-        for iterate_4 in intents["news"]:
-            if query == iterate_4:
-                news()
-                break
-        for iterate_5 in intents["time"]:
-            if query == iterate_5:
-                tell_time()
-                break
-        for iterate_6 in intents["date"]:
-            if query == iterate_6:
-                tell_day()
-                break
-        for iterate_7 in intents["weather"]:
-            if query == iterate_7:
-                weather()
-                break
-        for iterate_8 in intents["wikipedia"]:
-            if query == iterate_8:
-                wikipedia()
-                break
-        for iterate_9 in intents["name"]:
-            if query == iterate_9:
-                name()
-                break
-        for iterate_10 in intents["wolfram"]:
-            if query == iterate_10:
-                wolfram()
-                break
-        for iterate_11 in intents["done"]:
-            if query == iterate_11:
-                speak("Goodbye")
-                done = True
+def main():
 
-
-if __name__ == '__main__':
-
-    #execution in main
-    # take_query()
     print("Say hello!")
-    
-    take_query_intents()
+    take_query()
+main()
+
+
+ 
