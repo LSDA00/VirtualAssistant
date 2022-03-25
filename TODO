@@ -15,5 +15,6 @@
 # Better text to speech engine IBM Watson https://stackoverflow.com/questions/50548088/make-python-speech-recognition-faster
 # 
 # * More diverse training data for model to enable better "conversation"
+# * comment functions pls
 
 
