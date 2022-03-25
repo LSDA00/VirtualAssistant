@@ -1,0 +1,184 @@
+{
+    "intents": [
+         {
+             "tag": "greetings",
+             "patterns": [
+                 "hello",
+                 "hey",
+                 "hi",
+                 "good day",
+                 "greetings",
+                 "what's up?",
+                 "how is it going?"
+             ],
+             "responses": [
+                 "Hello!",
+                 "Hey!",
+                 "What can I do for you?"
+             ]
+         },
+         {
+             "tag": "goodbye",
+             "patterns": [
+                 "see you later",
+                 "goodbye",
+                 "okay thank you",
+                 "bye",
+                 "thank you",
+                 "okay that's enough",
+                 "stop"
+             ],
+             "responses": [
+                 "Okay, talk later",
+                 "Okay, please let me know if there is anything else I can help you with",
+                 "Goodbye!"
+             ]
+         },
+         {
+             "tag": "quote",
+             "patterns": [
+                 "quote",
+                 "read me a quote",
+                 "tell me a kanye quote",
+                 "give me a kanye west quote",
+                 "tell me a quote from kanye west"
+             ],
+             "responses": [
+                 "Okay here is a quote you might like",
+                 "Okay, well then here is an insightful and wise quote for you"
+             ]
+         },
+         {
+             "tag": "briefing",
+             "patterns": [
+                 "briefing",
+                 "give me my briefing",
+                 "brief me",
+                 "i'd like to be briefed",
+                 "give me a briefing"
+             ],
+             "responses": [
+                 "Okay, here is your briefing!"
+             ]
+         },
+         {
+             "tag": "news",
+             "patterns": [
+                 "news",
+                 "what's going on in the news",
+                 "what is the news like today",
+                 "is there any news",
+                 "i would like to hear the news",
+                 "tell me the news"
+             ],
+             "responses": [
+                 "I'll grab my newspaper!", 
+                 "Hopefully it's something good!",
+                 "You like to be informed, and I like that about you!"
+             ]
+         },
+         {
+             "tag": "time",
+             "patterns": [
+                 "time",
+                 "what time is it",
+                 "tell me the time",
+                 "what is the time"
+             ],
+             "responses": [
+                 "The time is x"
+             ]
+         },
+         {
+             "tag": "date",
+             "patterns": [
+                 "date",
+                 "what day is it",
+                 "what is the date",
+                 "what day of the week is it",
+                 "what day is today"
+             ],
+             "responses": [
+                 "The day is x"
+             ]
+         },
+         {
+             "tag": "weather",
+             "patterns": [
+                 "weather",
+                 "what is the weather like",
+                 "what is todays weather",
+                 "is it warm out",
+                 "is it cold out",
+                 "is it snowing",
+                 "is it raining",
+                 "how is the weather today"
+             ],
+             "responses": [
+                 "The weather is x"
+             ]
+         },
+         {
+             "tag": "wikipedia",
+             "patterns": [
+                 "i want to look something up on wikipedia",
+                 "i want to search a topic on wikipedia"
+             ],
+             "responses": [
+                 "Okay, I'll pull up wikipedia", 
+                 "I'll get right on that", 
+                 "Okay, but remember to check your sources!"
+             ]
+         },
+         {
+             "tag": "name",
+             "patterns": [
+                 "name",
+                 "what is your name",
+                 "what should I call you",
+                 "do you have a name",
+                 "whats your name"
+             ],
+             "responses": [
+                 "I'm 8 Oh 5!", 
+                 "My name is 8 Oh 5!", 
+                 "I am 8 Oh 5, your virtual assistant", 
+                 "My friends call me 8 Oh 5!"
+             ]
+         },
+         {
+             "tag": "wolfram",
+             "patterns": [
+                 "question",
+                 "i would like to ask you a question",
+                 "i have a question"
+             ],
+             "responses": ["I'll pull up Wolfram Alpha"]
+         }, 
+         {
+             "tag": "google", 
+             "patterns": [
+                 "open google", 
+                 "I want to search the internet", 
+                 "open browser", 
+                 "I want to google something"
+             ], 
+             "responses": ["Okay, I'll open up Google in your browser!"]
+         }, 
+         {
+             "tag": "joke", 
+             "patterns": [
+                 "tell me a joke", 
+                 "do you know any jokes?",
+                 "funny", 
+                 "tell me something funny", 
+                 "I'd like to hear a joke"
+             ], 
+             "responses": [
+                 "Okay, here goes nothing.", 
+                 "I'm pretty funny so be prepared", 
+                 "A laugh a day keeps the doctor away, at least... that's what they say. I bet Alexa can't rhyme like that."
+             ]
+         }
+     ]
+ } 
